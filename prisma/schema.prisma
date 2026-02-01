@@ -1,0 +1,144 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==========================================
+// USER - Utilisateurs de l'application
+// ==========================================
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  image         String?   // Photo de profil Google
+
+  // Authentification Google OAuth
+  googleId      String?   @unique
+
+  // Crédits de chat
+  chatCredits   Int       @default(5) // Crédits gratuits par défaut
+
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  subscription  Subscription?
+  chatSessions  ChatSession[]
+
+  @@map("users")
+}
+
+// ==========================================
+// SUBSCRIPTION - Abonnements Stripe
+// ==========================================
+enum SubscriptionStatus {
+  TRIAL           // Période d'essai (3 jours gratuits)
+  ACTIVE          // Abonnement actif
+  CANCELED        // Abonnement annulé (reste actif jusqu'à la fin de période)
+  EXPIRED         // Abonnement expiré
+  PAST_DUE        // Paiement en retard
+}
+
+enum SubscriptionPlan {
+  FREE            // Plan gratuit (5 crédits)
+  BASIC           // Plan basique (50 crédits/mois)
+  PREMIUM         // Plan premium (illimité)
+}
+
+model Subscription {
+  id                    String              @id @default(cuid())
+
+  // Relation utilisateur
+  userId                String              @unique
+  user                  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Informations Stripe
+  stripeCustomerId      String?             @unique
+  stripeSubscriptionId  String?             @unique
+  stripePriceId         String?
+
+  // Plan et statut
+  plan                  SubscriptionPlan    @default(FREE)
+  status                SubscriptionStatus  @default(TRIAL)
+
+  // Crédits mensuels selon le plan
+  monthlyCredits        Int                 @default(5)
+  creditsUsed           Int                 @default(0)
+
+  // Période d'essai
+  trialStartDate        DateTime?
+  trialEndDate          DateTime?
+
+  // Dates d'abonnement
+  currentPeriodStart    DateTime?
+  currentPeriodEnd      DateTime?
+  cancelAtPeriodEnd     Boolean             @default(false)
+
+  // Timestamps
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  @@map("subscriptions")
+}
+
+// ==========================================
+// CHAT SESSION - Sessions de conversation
+// ==========================================
+model ChatSession {
+  id          String    @id @default(cuid())
+
+  // Relation utilisateur
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Métadonnées de la session
+  title       String    @default("Nouvelle conversation")
+
+  // Timestamps
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  messages    Message[]
+
+  @@index([userId])
+  @@map("chat_sessions")
+}
+
+// ==========================================
+// MESSAGE - Messages dans les conversations
+// ==========================================
+enum MessageRole {
+  USER        // Message de l'utilisateur
+  ASSISTANT   // Réponse de l'IA
+  SYSTEM      // Message système (contexte)
+}
+
+model Message {
+  id            String      @id @default(cuid())
+
+  // Relation session
+  chatSessionId String
+  chatSession   ChatSession @relation(fields: [chatSessionId], references: [id], onDelete: Cascade)
+
+  // Contenu du message
+  role          MessageRole
+  content       String      @db.Text
+
+  // Métadonnées optionnelles (tokens utilisés, etc.)
+  metadata      Json?
+
+  // Timestamps
+  createdAt     DateTime    @default(now())
+
+  @@index([chatSessionId])
+  @@map("messages")
+}
