@@ -46,7 +46,7 @@ export default function Home() {
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
               Votre coach personnel
-              <span className="bg-gradient-to-r from-[#7c3aed] to-[#06b6d4] bg-clip-text text-transparent"> propulse par l&apos;IA</span>
+              <span className="bg-gradient-to-r from-[#7c3aed] to-[#06b6d4] bg-clip-text text-transparent"> propulse par l'IA</span>
             </h1>
             <p className="text-lg sm:text-xl text-[var(--muted)] mb-8 max-w-2xl mx-auto">
               Obtenez des conseils personnalises en dating et dans votre vie quotidienne.
@@ -82,12 +82,12 @@ export default function Home() {
               <div className="p-6 space-y-4">
                 <div className="flex justify-end">
                   <div className="gradient-primary text-white rounded-2xl rounded-br-md px-4 py-3 max-w-xs">
-                    <p className="text-sm">J&apos;ai un rendez-vous ce soir et je suis stresse...</p>
+                    <p className="text-sm">J'ai un rendez-vous ce soir et je suis stresse...</p>
                   </div>
                 </div>
                 <div className="flex justify-start">
                   <div className="bg-[var(--background)] border border-[var(--border)] rounded-2xl rounded-bl-md px-4 py-3 max-w-md">
-                    <p className="text-sm">Je comprends ! C&apos;est tout a fait normal. Voici quelques conseils pour te sentir plus confiant : sois toi-meme, prepare quelques sujets de conversation, et n&apos;oublie pas de respirer ! Tu vas assurer.</p>
+                    <p className="text-sm">Je comprends ! C'est tout à fait normal. Voici quelques conseils pour te sentir plus confiant : sois toi-même, prepare quelques sujets de conversation, et n'oublie pas de respirer ! Tu vas assurer.</p>
                   </div>
                 </div>
               </div>
