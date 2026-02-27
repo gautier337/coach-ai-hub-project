@@ -46,7 +46,7 @@ export default function Home() {
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
               Votre coach personnel
-              <span className="bg-gradient-to-r from-[#7c3aed] to-[#06b6d4] bg-clip-text text-transparent"> propulse par l'IA</span>
+              <span className="bg-gradient-to-r from-[#7c3aed] to-[#06b6d4] bg-clip-text text-transparent"> propulsé par l'IA</span>
             </h1>
             <p className="text-lg sm:text-xl text-[var(--muted)] mb-8 max-w-2xl mx-auto">
               Obtenez des conseils personnalises en dating et dans votre vie quotidienne.
