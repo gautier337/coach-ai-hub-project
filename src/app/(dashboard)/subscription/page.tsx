@@ -192,7 +192,7 @@ export default function SubscriptionPage() {
   const totalDays = 30;
   const progressPercent = Math.min(100, Math.round(((totalDays - daysRemaining) / totalDays) * 100));
 
-  const hasActiveSubscription = ["ACTIVE", "CANCELED"].includes(status) && currentPlan !== "FREE";
+  const hasActiveSubscription = ["ACTIVE", "CANCELED", "TRIAL"].includes(status) && currentPlan !== "FREE";
 
   return (
     <DashboardLayout title="Abonnement" subtitle="Gérez votre abonnement et vos paiements">

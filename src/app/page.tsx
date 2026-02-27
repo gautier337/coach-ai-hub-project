@@ -276,7 +276,7 @@ export default function Home() {
               </Link>
             </div>
             <p className="text-sm text-[var(--muted)]">
-              2025 Coach AI. Tous droits reserves.
+              2026 Coach AI. Tous droits reserves.
             </p>
           </div>
         </div>
