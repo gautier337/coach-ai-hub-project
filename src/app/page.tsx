@@ -102,7 +102,7 @@ export default function Home() {
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">Pourquoi Coach AI ?</h2>
             <p className="text-[var(--muted)] max-w-2xl mx-auto">
-              Une intelligence artificielle concue pour vous accompagner dans tous les aspects de votre vie personnelle.
+              Une intelligence artificielle conçue pour vous accompagner dans tous les aspects de votre vie personnelle.
             </p>
           </div>
 
@@ -115,7 +115,7 @@ export default function Home() {
                   </svg>
                 ),
                 title: "Disponible 24/7",
-                description: "Posez vos questions a tout moment, jour et nuit. Votre coach est toujours la pour vous.",
+                description: "Posez vos questions à tout moment, jour et nuit. Votre coach est toujours là pour vous.",
               },
               {
                 icon: (
@@ -124,7 +124,7 @@ export default function Home() {
                   </svg>
                 ),
                 title: "100% Confidentiel",
-                description: "Vos conversations restent privees. Parlez librement sans jugement.",
+                description: "Vos conversations restent privées. Parlez librement sans jugement.",
               },
               {
                 icon: (
@@ -133,7 +133,7 @@ export default function Home() {
                   </svg>
                 ),
                 title: "Conseils Personnalises",
-                description: "Notre IA s&apos;adapte a votre situation pour des conseils vraiment pertinents.",
+                description: "Notre IA s'adapte à votre situation pour des conseils vraiment pertinents.",
               },
             ].map((feature, index) => (
               <div
@@ -233,11 +233,11 @@ export default function Home() {
         <div className="max-w-4xl mx-auto">
           <div className="gradient-primary rounded-3xl p-8 sm:p-12 text-center text-white">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              Pret a transformer votre vie ?
+              Prêt à transformer votre vie ?
             </h2>
             <p className="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
-              Rejoignez des milliers d&apos;utilisateurs qui ont deja franchi le pas.
-              3 jours d&apos;essai gratuit, sans engagement.
+              Rejoignez des milliers d'utilisateurs qui ont déjà franchi le pas.
+              3 jours d'essai gratuit, sans engagement.
             </p>
             <Link
               href="/register"
@@ -266,17 +266,17 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-6 text-sm text-[var(--muted)]">
               <Link href="/terms" className="hover:text-[var(--foreground)] transition-colors">
-                Conditions d&apos;utilisation
+                Conditions d'utilisation
               </Link>
               <Link href="/privacy" className="hover:text-[var(--foreground)] transition-colors">
-                Politique de confidentialite
+                Politique de confidentialité
               </Link>
               <Link href="/contact" className="hover:text-[var(--foreground)] transition-colors">
                 Contact
               </Link>
             </div>
             <p className="text-sm text-[var(--muted)]">
-              2026 Coach AI. Tous droits reserves.
+              2026 Coach AI. Tous droits réservés.
             </p>
           </div>
         </div>
