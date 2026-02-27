@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const navigation = [
   {
@@ -38,8 +40,28 @@ interface SidebarProps {
   onClose: () => void;
 }
 
+function getInitials(name: string | null | undefined): string {
+  if (!name) return "?";
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const { user, remainingCredits } = useCurrentUser();
+
+  const monthlyCredits = user?.subscription?.monthlyCredits ?? 5;
+  const creditsUsed = user?.subscription?.creditsUsed ?? 0;
+  const creditsPercent =
+    remainingCredits === -1
+      ? 10
+      : monthlyCredits > 0
+      ? Math.min(100, Math.round(((monthlyCredits - Math.max(0, remainingCredits)) / monthlyCredits) * 100))
+      : 0;
 
   return (
     <>
@@ -103,12 +125,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <div className="bg-[var(--background)] rounded-xl p-4 border border-[var(--border)]">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium">Crédits restants</span>
-                <span className="text-sm font-bold text-[var(--primary)]">15/20</span>
+                <span className="text-sm font-bold text-[var(--primary)]">
+                  {remainingCredits === -1 ? "∞" : `${Math.max(0, remainingCredits)}/${monthlyCredits}`}
+                </span>
               </div>
               <div className="w-full bg-[var(--border)] rounded-full h-2">
                 <div
                   className="gradient-primary h-2 rounded-full transition-all"
-                  style={{ width: "75%" }}
+                  style={{ width: `${creditsPercent}%` }}
                 />
               </div>
               <Link
@@ -120,19 +144,34 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             </div>
           </div>
 
-          {/* User profile */}
+          {/* User profile + logout */}
           <div className="px-4 pb-6">
-            <div className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[var(--border)] transition-colors cursor-pointer">
-              <div className="w-10 h-10 rounded-full bg-[var(--primary)] flex items-center justify-center text-white font-medium">
-                JD
-              </div>
+            <div className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[var(--border)] transition-colors">
+              {user?.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={user.image}
+                  alt={user.name ?? "Avatar"}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-[var(--primary)] flex items-center justify-center text-white font-medium text-sm">
+                  {getInitials(user?.name)}
+                </div>
+              )}
               <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">Jean Dupont</p>
-                <p className="text-xs text-[var(--muted)] truncate">jean@email.com</p>
+                <p className="font-medium truncate">{user?.name ?? "..."}</p>
+                <p className="text-xs text-[var(--muted)] truncate">{user?.email ?? ""}</p>
               </div>
-              <svg className="w-4 h-4 text-[var(--muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+              <button
+                onClick={() => signOut({ callbackUrl: "/login" })}
+                title="Se déconnecter"
+                className="p-1.5 hover:bg-[var(--accent)]/10 rounded-lg transition-colors text-[var(--muted)] hover:text-[var(--accent)]"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+              </button>
             </div>
           </div>
         </div>

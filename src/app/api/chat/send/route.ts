@@ -2,20 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { ChatService } from "@/services/chat.service";
 import { UserService } from "@/services/user.service";
 import { getOpenAI, SYSTEM_PROMPT } from "@/lib/openai";
+import { getAuthenticatedUser } from "@/lib/auth-helpers";
 
-// POST /api/chat/send - Envoyer un message et obtenir une réponse
 export async function POST(request: NextRequest) {
+  const { userId, error } = await getAuthenticatedUser();
+  if (error) return error;
+
   try {
     const body = await request.json();
-    const { userId, sessionId, message } = body;
-
-    // Validation des paramètres
-    if (!userId) {
-      return NextResponse.json(
-        { error: "userId est requis" },
-        { status: 400 }
-      );
-    }
+    const { sessionId, message } = body;
 
     if (!message || typeof message !== "string" || message.trim() === "") {
       return NextResponse.json(
@@ -24,8 +19,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Vérifier que l'utilisateur a des crédits disponibles
-    const hasCredits = await UserService.hasCredits(userId);
+    const hasCredits = await UserService.hasCredits(userId!);
     if (!hasCredits) {
       return NextResponse.json(
         {
@@ -38,14 +32,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Créer une nouvelle session si nécessaire
     let currentSessionId = sessionId;
     if (!currentSessionId) {
-      const newSession = await ChatService.createSession({ userId });
+      const newSession = await ChatService.createSession({ userId: userId! });
       currentSessionId = newSession.id;
     } else {
-      // Vérifier que la session appartient à l'utilisateur
-      const isOwner = await ChatService.isSessionOwner(currentSessionId, userId);
+      const isOwner = await ChatService.isSessionOwner(currentSessionId, userId!);
       if (!isOwner) {
         return NextResponse.json(
           { error: "Session non autorisée" },
@@ -54,23 +46,19 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Sauvegarder le message de l'utilisateur
     const userMessage = await ChatService.addMessage({
       chatSessionId: currentSessionId,
       role: "USER",
       content: message.trim(),
     });
 
-    // Récupérer l'historique pour le contexte
     const history = await ChatService.getFormattedHistory(currentSessionId);
 
-    // Préparer les messages pour OpenAI
     const openaiMessages = [
       { role: "system" as const, content: SYSTEM_PROMPT },
       ...history,
     ];
 
-    // Appeler l'API OpenAI
     const openai = getOpenAI();
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -83,7 +71,6 @@ export async function POST(request: NextRequest) {
       completion.choices[0]?.message?.content ||
       "Désolé, je n'ai pas pu générer une réponse.";
 
-    // Sauvegarder la réponse de l'assistant
     const assistantMessage = await ChatService.addMessage({
       chatSessionId: currentSessionId,
       role: "ASSISTANT",
@@ -98,17 +85,14 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Décrémenter les crédits de l'utilisateur
-    await UserService.decrementCredits(userId);
+    await UserService.decrementCredits(userId!);
 
-    // Générer un titre si c'est le premier message
     const session = await ChatService.getSessionById(currentSessionId);
     if (session && session.messages.length <= 2) {
       await ChatService.generateTitle(currentSessionId);
     }
 
-    // Obtenir les crédits restants
-    const user = await UserService.findById(userId);
+    const user = await UserService.findById(userId!);
     const remainingCredits = user?.subscription
       ? user.subscription.plan === "PREMIUM"
         ? -1
@@ -131,10 +115,10 @@ export async function POST(request: NextRequest) {
       },
       remainingCredits,
     });
-  } catch (error) {
-    console.error("Erreur envoi message:", error);
+  } catch (err) {
+    console.error("Erreur envoi message:", err);
 
-    if (error instanceof Error && error.message.includes("OPENAI_API_KEY")) {
+    if (err instanceof Error && err.message.includes("OPENAI_API_KEY")) {
       return NextResponse.json(
         { error: "Configuration OpenAI manquante" },
         { status: 500 }

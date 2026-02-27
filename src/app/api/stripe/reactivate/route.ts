@@ -1,26 +1,20 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { StripeService } from "@/services/stripe.service";
+import { getAuthenticatedUser } from "@/lib/auth-helpers";
 
-export async function POST(request: NextRequest) {
+export async function POST() {
+  const { userId, error } = await getAuthenticatedUser();
+  if (error) return error;
+
   try {
-    const body = await request.json();
-    const { userId } = body;
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: "userId est requis" },
-        { status: 400 }
-      );
-    }
-
-    await StripeService.reactivateSubscription(userId);
+    await StripeService.reactivateSubscription(userId!);
 
     return NextResponse.json({
       success: true,
       message: "Abonnement réactivé avec succès.",
     });
-  } catch (error) {
-    console.error("Erreur réactivation:", error);
+  } catch (err) {
+    console.error("Erreur réactivation:", err);
     return NextResponse.json(
       { error: "Erreur lors de la réactivation de l'abonnement" },
       { status: 500 }

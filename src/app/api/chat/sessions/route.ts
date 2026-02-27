@@ -1,22 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ChatService } from "@/services/chat.service";
+import { getAuthenticatedUser } from "@/lib/auth-helpers";
 
-// GET /api/chat/sessions?userId=xxx - Obtenir toutes les sessions d'un utilisateur
-export async function GET(request: NextRequest) {
+export async function GET() {
+  const { userId, error } = await getAuthenticatedUser();
+  if (error) return error;
+
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
+    const sessions = await ChatService.getUserSessions(userId!);
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: "userId est requis" },
-        { status: 400 }
-      );
-    }
-
-    const sessions = await ChatService.getUserSessions(userId);
-
-    // Formater les sessions pour l'API
     const formattedSessions = sessions.map((session) => ({
       id: session.id,
       title: session.title,
@@ -27,8 +19,8 @@ export async function GET(request: NextRequest) {
     }));
 
     return NextResponse.json({ sessions: formattedSessions });
-  } catch (error) {
-    console.error("Erreur récupération sessions:", error);
+  } catch (err) {
+    console.error("Erreur récupération sessions:", err);
     return NextResponse.json(
       { error: "Erreur lors de la récupération des sessions" },
       { status: 500 }
@@ -36,21 +28,16 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/chat/sessions - Créer une nouvelle session
 export async function POST(request: NextRequest) {
+  const { userId, error } = await getAuthenticatedUser();
+  if (error) return error;
+
   try {
     const body = await request.json();
-    const { userId, title } = body;
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: "userId est requis" },
-        { status: 400 }
-      );
-    }
+    const { title } = body;
 
     const session = await ChatService.createSession({
-      userId,
+      userId: userId!,
       title: title || "Nouvelle conversation",
     });
 
@@ -61,8 +48,8 @@ export async function POST(request: NextRequest) {
         createdAt: session.createdAt,
       },
     });
-  } catch (error) {
-    console.error("Erreur création session:", error);
+  } catch (err) {
+    console.error("Erreur création session:", err);
     return NextResponse.json(
       { error: "Erreur lors de la création de la session" },
       { status: 500 }

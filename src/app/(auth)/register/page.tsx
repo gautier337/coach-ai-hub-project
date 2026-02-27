@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 export default function RegisterPage() {
   return (
@@ -41,7 +42,7 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      {/* Right side - Registration form */}
+      {/* Right side */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           {/* Mobile logo */}
@@ -60,8 +61,10 @@ export default function RegisterPage() {
               Commencez avec 3 jours d&apos;essai gratuit
             </p>
 
-            {/* Google Sign Up Button */}
-            <button className="w-full flex items-center justify-center gap-3 bg-white border border-[var(--border)] rounded-xl px-4 py-3 font-medium text-gray-700 hover:bg-gray-50 transition-colors mb-6">
+            <button
+              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+              className="w-full flex items-center justify-center gap-3 bg-white border border-[var(--border)] rounded-xl px-4 py-3 font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -71,77 +74,6 @@ export default function RegisterPage() {
               S&apos;inscrire avec Google
             </button>
 
-            <div className="relative mb-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-[var(--border)]"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="bg-[var(--card-bg)] px-4 text-[var(--muted)]">ou</span>
-              </div>
-            </div>
-
-            {/* Registration form */}
-            <form className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Prénom</label>
-                  <input
-                    type="text"
-                    placeholder="Jean"
-                    className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Nom</label>
-                  <input
-                    type="text"
-                    placeholder="Dupont"
-                    className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Email</label>
-                <input
-                  type="email"
-                  placeholder="votre@email.com"
-                  className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Mot de passe</label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all"
-                />
-                <p className="text-xs text-[var(--muted)] mt-1">
-                  Minimum 8 caractères avec au moins une majuscule et un chiffre
-                </p>
-              </div>
-              <div>
-                <label className="flex items-start gap-2 cursor-pointer">
-                  <input type="checkbox" className="w-4 h-4 mt-0.5 rounded border-[var(--border)] text-[var(--primary)] focus:ring-[var(--primary)]" />
-                  <span className="text-sm text-[var(--muted)]">
-                    J&apos;accepte les{" "}
-                    <Link href="/terms" className="text-[var(--primary)] hover:underline">
-                      Conditions d&apos;utilisation
-                    </Link>{" "}
-                    et la{" "}
-                    <Link href="/privacy" className="text-[var(--primary)] hover:underline">
-                      Politique de confidentialité
-                    </Link>
-                  </span>
-                </label>
-              </div>
-              <button
-                type="submit"
-                className="w-full gradient-primary text-white font-medium py-3 px-4 rounded-xl hover:opacity-90 transition-opacity"
-              >
-                Créer mon compte
-              </button>
-            </form>
-
             <p className="text-center text-[var(--muted)] text-sm mt-6">
               Déjà un compte ?{" "}
               <Link href="/login" className="text-[var(--primary)] font-medium hover:underline">
@@ -149,6 +81,17 @@ export default function RegisterPage() {
               </Link>
             </p>
           </div>
+
+          <p className="text-center text-xs text-[var(--muted)] mt-6">
+            En continuant, vous acceptez nos{" "}
+            <Link href="/terms" className="underline hover:text-[var(--primary)]">
+              Conditions d&apos;utilisation
+            </Link>{" "}
+            et notre{" "}
+            <Link href="/privacy" className="underline hover:text-[var(--primary)]">
+              Politique de confidentialité
+            </Link>
+          </p>
         </div>
       </div>
     </div>

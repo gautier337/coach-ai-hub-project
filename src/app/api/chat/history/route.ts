@@ -1,27 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ChatService } from "@/services/chat.service";
+import { getAuthenticatedUser } from "@/lib/auth-helpers";
 
-// GET /api/chat/history?userId=xxx&limit=50 - Obtenir l'historique complet des chats
 export async function GET(request: NextRequest) {
+  const { userId, error } = await getAuthenticatedUser();
+  if (error) return error;
+
   try {
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
     const limitParam = searchParams.get("limit");
     const limit = limitParam ? parseInt(limitParam, 10) : undefined;
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: "userId est requis" },
-        { status: 400 }
-      );
-    }
+    const sessions = await ChatService.getUserSessions(userId!);
+    const totalMessages = await ChatService.countUserMessages(userId!);
 
-    const sessions = await ChatService.getUserSessions(userId);
-
-    // Calculer les statistiques
-    const totalMessages = await ChatService.countUserMessages(userId);
-
-    // Formater pour l'API
     const history = sessions.slice(0, limit).map((session) => ({
       id: session.id,
       title: session.title,
@@ -38,8 +30,8 @@ export async function GET(request: NextRequest) {
         totalMessages,
       },
     });
-  } catch (error) {
-    console.error("Erreur récupération historique:", error);
+  } catch (err) {
+    console.error("Erreur récupération historique:", err);
     return NextResponse.json(
       { error: "Erreur lors de la récupération de l'historique" },
       { status: 500 }
